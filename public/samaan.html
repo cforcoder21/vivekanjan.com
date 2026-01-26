@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio | Vivek Anjan Shrivastava</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap">
+  <link href="../style/style_published.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header>
+<div id="templatemo_site_title_bar_wrapper">
+  <div id="templatemo_site_title_bar">
+    <div id="site_title">
+      <h1>
+        <a href="http:/" target="_parent">
+          <h2>Vivek Anjan Shrivastava</h2>
+          <span class="style5">Writer | Motivator | IT Professional</span>
+        </a>
+      </h1>
+    </div>
+
+    <ul id="top_menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="aboutme.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</div>
+</header>
+
+<nav id="black_nav_bar_wrapper">
+    <div id="black_nav_bar">
+        
+        <ul id="black_menu">
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="aboutme.html">ABOUT</a></li>
+            <li><a href="books.html">BOOKS</a></li>
+            <li><a href="http://www.vivekanjan.blogspot.in/" target="_blank" title="Blogspot">BLOG</a></li>
+            <li><a href="published.html">PUBLISHED</a></li>
+            <li><a href="contact.html">CONTACT</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#newsletter">NEWSLETTER</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+  <div class="section-title">
+    <h2>सम्मान </h2>
+  </div>
+  <div class="published-gallery">
+    <div class="published-card">
+      <img src="sammann.jpg" alt="Samman 1">
+    </div>
+    <div class="published-card">
+      <img src="sam2.jpeg" alt="Samman 2" id="sam2">
+    </div>
+    <div class="published-card">
+      <img src="sam3.jpg" alt="Samman 3">
+    </div>
+  </div>
+</div>
+
+<div id="imageModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="modalImage">
+</div>
+
+<div class="footer">
+  <p>ये एक पन्ना था अभी तो किताब बाकी हैं ...</p>
+  <p>&copy; 2025 Vivek Anjan Shrivastava</p>
+</div>
+
+<script>
+// Get the modal
+var modal = document.getElementById("imageModal");
+
+// Get the image and insert it inside the modal
+var modalImg = document.getElementById("modalImage");
+var images = document.querySelectorAll(".published-card img");
+
+// Loop through all gallery images and add the click event
+images.forEach(img => {
+  img.onclick = function(){
+    modal.style.display = "block";
+    modalImg.src = this.src;
+  }
+});
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the image (on the modal background), close it
+modal.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>

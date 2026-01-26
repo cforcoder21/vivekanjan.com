@@ -1,0 +1,346 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #333;
+    font-weight: bolder;
+}
+
+a {
+    text-decoration: none;
+    color: #006699;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #004466;
+    text-decoration: none;
+}
+
+/* Header styling */
+
+#templatemo_site_title_bar_wrapper {
+    background-color: #40a80c;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    text-decoration: none;
+}
+
+#templatemo_site_title_bar {
+    width: 960px;
+    margin: 0 auto;
+    padding: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+}
+
+#templatemo_site_title_bar h1 a {
+    font-size: 26px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+#templatemo_site_title_bar h1 a .style5 {
+    font-size: 14px;
+    display: block;
+    color: #ccc;
+    text-decoration: none;
+}
+
+#templatemo_site_title_bar_wrapper:hover {
+    background-color: white !important;
+}
+
+#templatemo_site_title_bar_wrapper:hover * {
+    color: black !important;
+}
+
+#site_title {
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
+#site_title a h2 {
+    color: white;
+    font-size: 28px;
+    margin: 0;
+    line-height: 1;
+}
+
+#site_title a .style5 {
+    display: block;
+    font-size: 13px;
+    color: #ccc;
+}
+
+#site_title a:hover h2,
+#site_title a:hover .style5 {
+    color: #eee;
+}
+
+#top_menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+#top_menu li a {
+    font-size: 16px;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+#top_menu li a:hover {
+    background-color: #ffffff;
+    color: #2f4f4f;
+}
+
+#black_nav_bar_wrapper {
+    background-color: #000;
+    transition: all 0.3s ease;
+    padding: 10px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+#black_nav_bar {
+    width: 960px;
+    margin: 0 auto;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+}
+
+#black_nav_bar h2 {
+    font-size: 22px;
+    color: #ffffff;
+    margin: 0;
+}
+
+#black_menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+}
+
+#black_menu li a {
+    font-size: 16px;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background 0.3s, color 0.3s;
+    text-decoration: none;
+}
+
+#black_menu li a:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #black_nav_bar {
+        flex-direction: column;
+        text-align: center;
+    }
+    #black_menu {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+  .intro-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* Containers */
+
+.container {
+    max-width: 960px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 25px 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333333;
+    text-align: justify;
+}
+
+/* --- Book Image Styling --- */
+.book-cover {
+  width: 80%;
+  max-width: 220px;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  object-fit: contain;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================
+   BOOKS: vertical stack
+   ========================= */
+
+.books-container-box {
+  display: flex;
+  flex-direction: column;     /* stack vertically */
+  align-items: center;        /* center the stack */
+  gap: 40px;
+  padding: 20px;
+}
+
+/* Each item looks like the first one: no card box, just clean content */
+.book-card {
+  width: 100%;
+  max-width: 640px;           /* consistent readable width */
+  background: transparent;    /* remove white box */
+  border-radius: 0;
+  padding: 0;                 /* remove card padding */
+  box-shadow: none;           /* remove card shadow */
+  text-align: center;
+  position: static;
+  transition: none;
+}
+
+/* subtle separator between items (optional) */
+.book-card + .book-card {
+  border-top: 1px solid #eee;
+  padding-top: 24px;
+}
+
+.book-card h4 {
+  font-size: 18px;
+  margin: 10px 0;
+  color: #2f4f4f;
+}
+
+.book-card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Buy button styles */
+
+.buy-button-container {
+    margin-top: 10px;
+    position: relative;
+    display: inline-block;
+}
+
+.buy-button {
+    background-color: #40a80c;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.buy-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 160px;
+    flex-direction: column;
+    text-decoration: none;
+}
+
+.buy-dropdown a {
+    color: #333;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+}
+
+.buy-dropdown a:hover {
+    background-color: #f0f0f0;
+}
+
+.buy-button-container:hover .buy-dropdown {
+  display: flex;
+}
+
+/* Footer */
+.footer {
+    background-color: #40a80c;
+    text-align: center;
+    padding: 20px;
+    color: white;
+    font-size: 14px;
+    margin-top: 40px;
+}
+
+/* table  */
+.publication-table-section {
+    max-width: 960px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.section-title h2 {
+    text-align: center;
+    color: #40a80c;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.publication-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    text-align: left;
+}
+
+.publication-table thead {
+    background-color: #40a80c;
+    color: white;
+}
+
+.publication-table th,
+.publication-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+.publication-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.publication-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
