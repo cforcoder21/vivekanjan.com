@@ -8,16 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="../css/style_book.css" rel="stylesheet" />
-  <link href="../css/clerk-styles.css" rel="stylesheet" />
-
-  <!-- Clerk JS SDK -->
-  <script
-    async
-    crossorigin="anonymous"
-    data-clerk-publishable-key="pk_test_bm90YWJsZS1wb3NzdW0tMi5jbGVyay5hY2NvdW50cy5kZXYk"
-    src="https://notable-possum-2.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
-    type="text/javascript"
-  ></script>
 </head>
 
 <body>
@@ -26,7 +16,7 @@
       <div class="header-spacer"></div>
       <h1 class="site-title">Vivek Anjan Shrivastava</h1>
       <div class="header-icons">
-        <a href="#" title="Sign In" id="signInBtn"><i class="fa-regular fa-user"></i></a>
+        <a href="#" title="Sign In"><i class="fa-regular fa-user"></i></a>
         <a href="index.html" title="Home"><i class="fa-solid fa-house"></i></a>
       </div>
     </div>
@@ -60,7 +50,7 @@
           <h4>अभिव्यक्ति - अंजन की संवेदनाएं</h4>
           <p>यह पुस्तक अभिव्यक्ति - अंजन की संवेदनाएं कवि विवेक अंजन श्रीवास्तव की भावनात्मक अनुभूतियों का सजीव संग्रह है। इस संग्रह में कुछ रचनाएँ जीवन के गहरे प्रश्नों को उठाती हैं, तो कुछ उन प्रश्नों के उत्तर खोजने की मानव-मन की जद्दोजहद को अभिव्यक्त करती हैं।</p>
           <div class="buy-button-container">
-            <a href="#" class="buy-button" onclick="buyWithAuth(event, this)">Buy Here</a>
+            <a href="#" class="buy-button" onclick="toggleDropdown(event, this)">Buy Here</a>
             <div class="buy-dropdown">
               <a href="https://amzn.in/d/ho2talQ" target="_blank">Buy on Amazon</a>
             </div>
@@ -72,7 +62,7 @@
           <h4>अंजन... कुछ दिल से</h4>
           <p>अंजन काजल का समानार्थी शब्द है। इसी शब्द पर आधारित यह दिल से लिखा, दिल को छूने वाला काव्य संग्रह अंजन... कुछ दिल से पाठकों को संवेदनाओं के करीब ले जाता है।</p>
           <div class="buy-button-container">
-            <a href="#" class="buy-button" onclick="buyWithAuth(event, this)">Buy Here</a>
+            <a href="#" class="buy-button" onclick="toggleDropdown(event, this)">Buy Here</a>
             <div class="buy-dropdown">
               <a href="https://store.pothi.com/book/%E0%A4%B5%E0%A4%BF%E0%A4%B5%E0%A5%87%E0%A4%95-%E0%A4%85%E0%A4%82%E0%A4%9C%E0%A4%A8-%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%B5%E0%A4%BE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A4%B5-%E0%A4%85%E0%A4%82%E0%A4%9C%E0%A4%A8/" target="_blank">Buy on Pothi</a>
               <a href="https://www.amazon.in/%E0%A4%85%E0%A4%82%E0%A4%9C%E0%A4%A8-%E0%A4%95%E0%A5%81%E0%A4%9B-%E0%A4%A6%E0%A4%BF%E0%A4%B2-%E0%A4%B8%E0%A5%87-Hindi-ebook/dp/B0BNDHTJ7Q" target="_blank">Buy Ebook</a>
@@ -85,7 +75,7 @@
           <h4>अंतर्मन</h4>
           <p>जीवन में हम सब की समस्याएं लगभग एक सी हैं। उनकी दार्शनिक सोच को भारतीय संस्कारों के तहत अपने शेरों में रूपायित किया है, जो इस पुस्तक को एक आत्मीय स्वर देता है।</p>
           <div class="buy-button-container">
-            <a href="#" class="buy-button" onclick="buyWithAuth(event, this)">Buy Here</a>
+            <a href="#" class="buy-button" onclick="toggleDropdown(event, this)">Buy Here</a>
             <div class="buy-dropdown">
               <a href="https://www.flipkart.com/vidhwaan-kaviyon-ka-antarman/p/itmdy8m9tgvdbayn?pid=9789384236205&ref=L%3A1156165615059355101&srno=p_15&query=utkarsh+prakashan&otracker=from-search" target="_blank">Buy on Flipkart</a>
             </div>
@@ -176,25 +166,6 @@
         });
       }
     });
-
-    // ── BOOKS PAGE: require sign-in before showing buy dropdown ──
-    // Wraps toggleDropdown — if not logged in, opens auth modal instead
-    function buyWithAuth(event, el) {
-      event.preventDefault();
-      if (window.Clerk && Clerk.user) {
-        // Logged in — show buy dropdown as normal
-        toggleDropdown(event, el);
-      } else {
-        // Not logged in — open sign-in modal
-        if (window.openSignInModal) {
-          openSignInModal();
-        }
-      }
-    }
   </script>
-
-  <!-- ── CLERK AUTH ─────────────────────────────────────────── -->
-  <script src="../js/clerk-auth.js"></script>
-
 </body>
 </html>

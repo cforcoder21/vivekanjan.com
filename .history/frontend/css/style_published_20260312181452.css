@@ -1,0 +1,256 @@
+:root {
+  --cream:      #f5f0e8;
+  --cream-dark: #ede6d6;
+  --cream-mid:  #f9f6f0;
+  --ink:        #1a1a1a;
+  --ink-soft:   #3a3530;
+  --ink-light:  #6b6258;
+  --blue-line:  #4a90c4;
+  --blue-deep:  #2c6fa6;
+  --green:      #40a80c;
+  --green-dark: #2d7a08;
+  --border:     #d4cbbf;
+  --shadow:     rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background-color: var(--cream);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+a {
+  text-decoration: none;
+  color: var(--ink);
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--blue-deep);
+}
+
+/* Header Styling */
+#templatemo_site_title_bar_wrapper {
+  background: var(--cream);
+  padding: 22px 60px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+#templatemo_site_title_bar {
+  width: 960px;
+  margin: 0 auto;
+  padding: 0 0 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--ink);
+  border-bottom: 2px solid var(--blue-line);
+}
+
+#site_title h2 {
+  color: var(--ink);
+  font-size: 28px;
+  margin: 0;
+}
+
+#site_title .style5 {
+  color: var(--ink-light);
+  font-size: 14px;
+}
+
+#top_menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+#top_menu li a {
+  color: var(--ink-soft);
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  transition: color 0.2s;
+}
+
+#top_menu li a:hover {
+  color: var(--blue-deep);
+}
+
+/* Black Navbar */
+#black_nav_bar_wrapper {
+  background-color: var(--ink);
+  padding: 10px 0;
+}
+
+#black_nav_bar {
+  width: 960px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#black_nav_bar h2 {
+  color: white;
+  font-size: 22px;
+}
+
+#black_menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+#black_menu li a {
+  color: white;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  transition: color 0.2s;
+}
+
+#black_menu li a:hover {
+  background-color: var(--blue-deep);
+  color: white;
+}
+
+/* Published Section */
+.container {
+  max-width: 960px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.section-title h2 {
+  font-size: 26px;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Playfair Display', serif;
+}
+
+.published-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.published-card {
+  flex: 1 1 200px;
+  max-width: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.published-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.published-card:hover img {
+  transform: scale(1.05);
+}
+
+
+/* Footer */
+.footer {
+  background-color: #40a80c;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  margin-top: 40px;
+}
+
+
+/* === PREVIOUS CSS CODE GOES HERE === */
+/* (Your existing styles for body, header, footer, etc.) */
+
+.published-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer; /* Add pointer to show it's clickable */
+}
+
+.published-card:hover img {
+  transform: scale(1.05);
+}
+
+
+/* === NEW CSS FOR THE MODAL/POPUP === */
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top of everything else */
+  padding-top: 60px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.9); /* Black background with opacity */
+}
+
+/* Modal Content (The Image) */
+.modal-content {
+  margin: auto;
+  display: block;
+  width: auto;
+  max-width: 80%;
+  max-height: 80vh;
+  /* Animation */
+  animation-name: zoom;
+  animation-duration: 0.5s;
+}
+
+/* Add Zoom Animation */
+@keyframes zoom {
+  from {transform: scale(0)}
+  to {transform: scale(1)}
+}
+
+/* The Close Button (X) */
+.close {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Footer */
+.footer {
+  background-color: #40a80c;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  margin-top: 40px;
+}
