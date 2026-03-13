@@ -182,8 +182,12 @@
 
     .book-cover {
       width: 100%;
-      height: 230px;
-      object-fit: cover;
+      height: 260px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      background: #ffffff;
+      padding: 8px;
       border-radius: 8px;
       border: 1px solid var(--border);
       margin-bottom: 12px;
@@ -321,7 +325,7 @@
 
     @media (max-width: 640px) {
       .books-grid { grid-template-columns: 1fr; }
-      .book-cover { height: auto; max-height: 360px; }
+      .book-cover { height: 320px; }
       .anthology-block { padding: 16px; }
       .header-icons { min-width: 44px; gap: 10px; }
       .header-icons a:first-child { display: none; }
