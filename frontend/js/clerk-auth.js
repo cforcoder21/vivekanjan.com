@@ -8,6 +8,7 @@
 // Replace with your actual Clerk Publishable Key from:
 // https://dashboard.clerk.com → Your App → API Keys
 const CLERK_PUBLISHABLE_KEY = 'pk_test_bm90YWJsZS1wb3NzdW0tMi5jbGVyay5hY2NvdW50cy5kZXYk';
+let clerkLoadPromise = null;
 
 // ── INITIALIZE CLERK ──────────────────────────────────────────
 // Clerk CDN script must be loaded before this file
@@ -15,13 +16,61 @@ const CLERK_PUBLISHABLE_KEY = 'pk_test_bm90YWJsZS1wb3NzdW0tMi5jbGVyay5hY2NvdW50c
 
 window.addEventListener('load', async () => {
   try {
-    await Clerk.load({ publishableKey: CLERK_PUBLISHABLE_KEY });
-    initAuthUI();
-    initCartProtection();
+    await ensureClerkLoaded();
   } catch (err) {
     console.error('Clerk failed to load:', err);
   }
 });
+
+async function ensureClerkLoaded() {
+  if (!window.Clerk) {
+    throw new Error('Clerk script is not available on this page.');
+  }
+
+  if (Clerk.loaded) {
+    return;
+  }
+
+  if (!clerkLoadPromise) {
+    clerkLoadPromise = Clerk.load({ publishableKey: CLERK_PUBLISHABLE_KEY })
+      .then(() => {
+        initAuthUI();
+        initCartProtection();
+        restorePendingCartItem();
+      })
+      .catch((error) => {
+        clerkLoadPromise = null;
+        throw error;
+      });
+  }
+
+  await clerkLoadPromise;
+}
+
+function getSignInProps() {
+  return {
+    forceRedirectUrl: window.location.href,
+    fallbackRedirectUrl: window.location.href,
+    signUpForceRedirectUrl: window.location.href,
+    signUpFallbackRedirectUrl: window.location.href,
+    withSignUp: true,
+    appearance: {
+      variables: {
+        colorPrimary: '#40a80c',
+        colorBackground: '#f9f6f0',
+        colorText: '#1a1a1a',
+        colorInputText: '#1a1a1a',
+        colorInputBackground: '#ffffff',
+        borderRadius: '8px',
+        fontFamily: "'EB Garamond', Georgia, serif",
+      },
+      elements: {
+        card: 'clerk-card-override',
+        formButtonPrimary: 'clerk-btn-override',
+      }
+    }
+  };
+}
 
 // ── AUTH UI — updates the header icons on every page ──────────
 function initAuthUI() {
@@ -94,9 +143,9 @@ function renderLoggedOutHeader(container) {
   const userAnchor = container.querySelector('a[title="Sign In"]');
   if (!userAnchor) return;
 
-  userAnchor.addEventListener('click', (e) => {
+  userAnchor.addEventListener('click', async (e) => {
     e.preventDefault();
-    openSignInModal();
+    await openSignInModal();
   });
 
   // Update the icon title to be more descriptive
@@ -106,58 +155,39 @@ function renderLoggedOutHeader(container) {
 // ── SIGN IN / SIGN UP MODAL ───────────────────────────────────
 // Clerk renders its own UI inside our modal wrapper
 
-function openSignInModal(redirectAfter = null) {
+async function openSignInModal(redirectAfter = null) {
   // Store redirect URL if buyer clicked "Add to Cart" while logged out
   if (redirectAfter) {
     sessionStorage.setItem('clerk_redirect_after', redirectAfter);
   }
 
-  let modal = document.getElementById('clerkAuthModal');
-  if (!modal) {
-    modal = createAuthModal();
-    document.body.appendChild(modal);
+  try {
+    await ensureClerkLoaded();
+  } catch (error) {
+    console.error('Unable to open Clerk sign-in:', error);
+    return;
   }
 
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  const modal = document.getElementById('clerkAuthModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+  document.body.style.overflow = '';
 
-  // Mount Clerk's Sign In component inside our modal
-  const mountPoint = document.getElementById('clerkMountPoint');
-  mountPoint.innerHTML = ''; // clear any previous mount
-
-  Clerk.mountSignIn(mountPoint, {
-    afterSignInUrl: window.location.href,
-    afterSignUpUrl: window.location.href,
-    appearance: {
-      variables: {
-        colorPrimary:      '#40a80c',   // brand green
-        colorBackground:   '#f9f6f0',   // cream
-        colorText:         '#1a1a1a',
-        colorInputText:    '#1a1a1a',
-        colorInputBackground: '#ffffff',
-        borderRadius:      '8px',
-        fontFamily:        "'EB Garamond', Georgia, serif",
-      },
-      elements: {
-        card:        'clerk-card-override',
-        formButton:  'clerk-btn-override',
-      }
-    }
-  });
+  Clerk.openSignIn(getSignInProps());
 }
 
 function closeAuthModal() {
-  const modal = document.getElementById('clerkAuthModal');
-  if (!modal) return;
-  modal.classList.remove('active');
-  document.body.style.overflow = '';
-
-  // Unmount Clerk component to free memory
-  const mountPoint = document.getElementById('clerkMountPoint');
-  if (mountPoint) {
-    Clerk.unmountSignIn(mountPoint);
-    mountPoint.innerHTML = '';
+  if (window.Clerk && typeof Clerk.closeSignIn === 'function') {
+    Clerk.closeSignIn();
   }
+
+  const modal = document.getElementById('clerkAuthModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+
+  document.body.style.overflow = '';
 }
 
 function createAuthModal() {
