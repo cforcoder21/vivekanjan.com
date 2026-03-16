@@ -1,0 +1,230 @@
+/* =============================================================
+   clerk-styles.css  —  vivekanjan.com
+   Add these styles to the bottom of style_index.css
+   AND style_book.css (paste into both files)
+   ============================================================= */
+
+/* ── USER MENU (logged-in header) ──────────────────────────── */
+.clerk-user-menu {
+  position: relative;
+}
+
+.clerk-avatar-btn {
+  background: none;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.clerk-avatar-btn:hover {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(64,168,12,0.15);
+}
+
+.clerk-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.clerk-avatar-initials {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--cream-dark);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* ── USER DROPDOWN ──────────────────────────────────────────── */
+.clerk-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--blue-line);
+  border-radius: 8px;
+  min-width: 220px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  z-index: 500;
+  overflow: hidden;
+  animation: dropdownIn 0.18s ease;
+}
+
+.clerk-dropdown.open {
+  display: block;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.clerk-dropdown-user {
+  padding: 14px 16px;
+  background: var(--cream-mid);
+  border-bottom: 1px solid var(--border);
+}
+
+.clerk-dropdown-user strong {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.92rem;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.clerk-dropdown-user span {
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  font-family: 'EB Garamond', serif;
+}
+
+.clerk-dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
+.clerk-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  font-family: 'EB Garamond', serif;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  border-bottom: 1px solid var(--cream-dark);
+}
+
+.clerk-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.clerk-dropdown-item:hover {
+  background: var(--cream-dark);
+  color: var(--blue-deep);
+}
+
+.clerk-dropdown-item i {
+  width: 14px;
+  font-size: 0.8rem;
+  color: var(--ink-light);
+}
+
+.clerk-signout-btn:hover i {
+  color: #c0392b;
+}
+
+.clerk-signout-btn:hover {
+  color: #c0392b;
+}
+
+/* ── AUTH MODAL WRAPPER ─────────────────────────────────────── */
+.clerk-auth-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.clerk-auth-modal.active {
+  display: flex;
+}
+
+.clerk-auth-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px);
+}
+
+.clerk-auth-inner {
+  position: relative;
+  z-index: 1;
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: clerkModalIn 0.25s ease;
+}
+
+@keyframes clerkModalIn {
+  from { transform: scale(0.94); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.clerk-auth-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--ink-light);
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+  z-index: 2;
+}
+
+.clerk-auth-close:hover {
+  color: var(--ink);
+}
+
+/* Clerk component overrides to match our cream theme */
+#clerkMountPoint .cl-card,
+#clerkMountPoint .cl-rootBox {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+#clerkMountPoint .cl-headerTitle {
+  font-family: 'Playfair Display', serif !important;
+}
+
+#clerkMountPoint .cl-formButtonPrimary {
+  background-color: var(--green) !important;
+  font-family: 'Cormorant Garamond', serif !important;
+}
+
+#clerkMountPoint .cl-formButtonPrimary:hover {
+  background-color: var(--green-dark) !important;
+}
+
+/* ── PROTECTED BUTTON STATE ─────────────────────────────────── */
+/* Books page — "Buy Here" button when logged out shows a lock hint */
+.buy-button.auth-required::after {
+  content: ' 🔒';
+  font-size: 0.75rem;
+}

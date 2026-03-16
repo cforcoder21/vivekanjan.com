@@ -8,6 +8,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="../css/style_index.css" rel="stylesheet">
+  <link href="../css/clerk-styles.css" rel="stylesheet">
+
+  <!-- Clerk JS SDK -->
+  <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_bm90YWJsZS1wb3NzdW0tMi5jbGVyay5hY2NvdW50cy5kZXYk"
+    src="https://notable-possum-2.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+    type="text/javascript"
+  ></script>
 </head>
 
 <body>
@@ -21,7 +31,7 @@
       <h1 class="site-title">Vivek Anjan Shrivastava</h1>
 
       <div class="header-icons">
-        <a href="#" title="Sign In"><i class="fa-regular fa-user"></i></a>
+        <a href="#" title="Sign In" id="signInBtn"><i class="fa-regular fa-user"></i></a>
         <a href="#" title="Cart" onclick="toggleCart(event)" class="cart-count">
           <i class="fa-solid fa-cart-shopping"></i>
           <span id="cart-badge">0</span>
@@ -38,7 +48,7 @@
         <div class="nav-dropdown">
           <a href="books.html">All Books</a>
           <a href="books.html#anthologies">Anthologies</a>
-          <a href="books.html#buy">Buy a Book</a>
+          <a href="books.html#all-books">Buy a Book</a>
         </div>
       </div>
       <div class="nav-item"><a href="published.html">Published</a></div>
@@ -57,26 +67,21 @@
       <div class="my-books-panel">
         <h3>My Books</h3>
 
-        <div class="mini-book-card" onclick="addToCart('abhivyakti','अभिव्यक्ति — अंजन की संवेदनाएं','../assets/images/new_release.jpg','₹299')">
+        <div class="mini-book-card" onclick="requireAuthForCart('abhivyakti','अभिव्यक्ति — अंजन की संवेदनाएं','../assets/images/new_release.jpg','₹299')">
           <img src="../assets/images/new_release.jpg" alt="अभिव्यक्ति" onerror="this.src='https://via.placeholder.com/160x130/ede6d6/3a3530?text=Book'">
           <div class="book-title">अभिव्यक्ति — अंजन की संवेदनाएं</div>
           <div class="book-desc">भावनात्मक अनुभूतियों का सजीव संग्रह</div>
           <a href="https://amzn.in/d/ho2talQ" target="_blank" class="btn-buy-sm" onclick="event.stopPropagation()">Buy on Amazon</a>
         </div>
 
-        <div class="mini-book-card" onclick="addToCart('anjan','अंजन…. कुछ दिल से','../assets/images/anjan.jpg','₹249')">
+        <div class="mini-book-card" onclick="requireAuthForCart('anjan','अंजन…. कुछ दिल से','../assets/images/anjan.jpg','₹249')">
           <img src="../assets/images/anjan.jpg" alt="अंजन" onerror="this.src='https://via.placeholder.com/160x130/ede6d6/3a3530?text=Book'">
           <div class="book-title">अंजन…. कुछ दिल से</div>
           <div class="book-desc">दिल से लिखा, दिल को छूने वाला काव्य संग्रह</div>
           <a href="https://store.pothi.com/book/%E0%A4%B5%E0%A4%BF%E0%A4%B5%E0%A5%87%E0%A4%95-%E0%A4%85%E0%A4%82%E0%A4%9C%E0%A4%A8-%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%B5%E0%A4%BE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A4%B5-%E0%A4%85%E0%A4%82%E0%A4%9C%E0%A4%A8/" target="_blank" class="btn-buy-sm" onclick="event.stopPropagation()">Buy on Pothi</a>
         </div>
 
-        <div class="mini-book-card" onclick="addToCart('antarman','अंतर्मन','../assets/images/antarman.png','₹199')">
-          <img src="../assets/images/antarman.png" alt="अंतर्मन" onerror="this.src='https://via.placeholder.com/160x130/ede6d6/3a3530?text=Book'">
-          <div class="book-title">अंतर्मन</div>
-          <div class="book-desc">दार्शनिक सोच को भारतीय संस्कारों का रूप</div>
-          <a href="https://www.flipkart.com/vidhwaan-kaviyon-ka-antarman/p/itmdy8m9tgvdbayn" target="_blank" class="btn-buy-sm" onclick="event.stopPropagation()">Buy on Flipkart</a>
-        </div>
+        <a href="books.html#all-books" class="btn-books-section">Go to books section to discover all the books</a>
       </div>
     </div>
 
@@ -263,113 +268,277 @@
       openVideo(id, title);
     }
 
+    // ── YOUTUBE VIDEOS ────────────────────────────────────────
     const YT_CHANNEL_ID = 'UCNzXqekLV-uxTXIkrTxUY1Q';
+
+    // Multiple feed sources are tried in order until one works.
+    const FEED_SOURCES = [
+      {
+        type: 'xml',
+        buildUrl: url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+      },
+      {
+        type: 'xml',
+        buildUrl: url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+      },
+      {
+        type: 'page',
+        buildUrl: () => 'https://r.jina.ai/http://www.youtube.com/user/vivekanjan/videos'
+      },
+      {
+        type: 'json',
+        buildUrl: url => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`
+      }
+    ];
+
+    // Last-resort fallback if every network source fails.
+    const FALLBACK_VIDEO_IDS = [
+      'vYxIQtsnhUs',
+      'hvSbdaIdL2A',
+      '_adAIH_Lh0g',
+      'R3F_utFI2Rk',
+      'GJJeWwhsKFU',
+      'TDyG9mVPt2Q'
+    ];
+
     const YT_FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`;
-    const RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(YT_FEED_URL)}`;
 
     function getFirstNodeText(parent, localName) {
       const node = parent.getElementsByTagNameNS('*', localName)[0];
       return node ? node.textContent.trim() : '';
     }
 
-    function getThumbnailUrl(entry) {
+    function getThumbnailUrl(entry, videoId) {
       const node = entry.getElementsByTagNameNS('*', 'thumbnail')[0];
-      return node ? node.getAttribute('url') || '' : '';
+      // fallback to direct YouTube thumbnail CDN if media:thumbnail missing
+      return (node && node.getAttribute('url'))
+        || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
     }
 
-    function renderVideoMessage(message) {
-      const section = document.getElementById('yt-videos-section');
-      if (!section) {
-        return;
-      }
-
-      section.innerHTML = '';
-      const notice = document.createElement('p');
-      notice.className = 'digital-space-text';
-      notice.style.fontSize = '0.82rem';
-      notice.style.textAlign = 'center';
-      notice.textContent = message;
-      section.appendChild(notice);
+    function formatDate(value) {
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
-    function renderVideosFromFeed(xmlText) {
+    function renderVideoMessage(msg) {
+      const s = document.getElementById('yt-videos-section');
+      if (!s) return;
+      s.innerHTML = `<p style="font-size:0.82rem;text-align:center;color:var(--ink-light);font-style:italic;">${msg}</p>`;
+    }
+
+    function renderVideos(xmlText) {
       const section = document.getElementById('yt-videos-section');
-      if (!section) {
-        return;
-      }
+      if (!section) return;
 
       const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
-      const parseError = xml.querySelector('parsererror');
-      if (parseError) {
-        throw new Error('Invalid YouTube feed response');
-      }
+      if (xml.querySelector('parsererror')) throw new Error('Bad XML');
 
       const entries = Array.from(xml.getElementsByTagNameNS('*', 'entry')).slice(0, 6);
-      if (entries.length === 0) {
-        renderVideoMessage('No videos found for this channel yet.');
-        return;
-      }
+      if (!entries.length) { renderVideoMessage('No videos found.'); return; }
 
       section.innerHTML = '';
+
       entries.forEach(entry => {
         const videoId = getFirstNodeText(entry, 'videoId');
-        const title = getFirstNodeText(entry, 'title') || 'Latest Video';
-        const published = formatPublishedDate(getFirstNodeText(entry, 'published'));
-        const thumbnail = getThumbnailUrl(entry) || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
-
-        if (!videoId) {
-          return;
-        }
+        const title   = getFirstNodeText(entry, 'title') || 'Latest Video';
+        const date    = formatDate(getFirstNodeText(entry, 'published'));
+        const thumb   = getThumbnailUrl(entry, videoId);
+        if (!videoId) return;
 
         const card = document.createElement('div');
         card.className = 'sidebar-video-card';
-        card.addEventListener('click', () => playVideo(videoId, title));
+        card.addEventListener('click', () => openVideo(videoId, title));
 
         card.innerHTML = `
           <div class="sidebar-thumb">
-            <img src="${thumbnail}" alt="${title}">
+            <img
+              src="${thumb}"
+              alt="${title}"
+              onerror="this.src='https://i.ytimg.com/vi/${videoId}/mqdefault.jpg'"
+            >
             <div class="sidebar-play"><i class="fa-solid fa-play"></i></div>
           </div>
           <div class="sidebar-video-info">
             <h4></h4>
-            <span>${published}</span>
+            <span>${date}</span>
+          </div>`;
+
+        // Set title safely (avoids XSS)
+        card.querySelector('h4').textContent = title;
+        section.appendChild(card);
+      });
+    }
+
+    function renderVideosFromIds(videoIds) {
+      const section = document.getElementById('yt-videos-section');
+      if (!section) return;
+
+      const ids = Array.isArray(videoIds)
+        ? videoIds.filter(Boolean).slice(0, 6)
+        : [];
+
+      if (!ids.length) {
+        renderVideoMessage('No videos found.');
+        return;
+      }
+
+      section.innerHTML = '';
+      ids.forEach(videoId => {
+        const title = 'Latest Video';
+        const card = document.createElement('div');
+        card.className = 'sidebar-video-card';
+        card.addEventListener('click', () => openVideo(videoId, title));
+
+        card.innerHTML = `
+          <div class="sidebar-thumb">
+            <img
+              src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg"
+              alt="${title}"
+              onerror="this.src='https://i.ytimg.com/vi/${videoId}/mqdefault.jpg'"
+            >
+            <div class="sidebar-play"><i class="fa-solid fa-play"></i></div>
+          </div>
+          <div class="sidebar-video-info">
+            <h4>${title}</h4>
+            <span>From YouTube channel</span>
+          </div>`;
+
+        section.appendChild(card);
+      });
+    }
+
+    function extractVideoIdsFromPage(pageText) {
+      const matches = pageText.match(/watch\?v=([a-zA-Z0-9_-]{11})/g) || [];
+      const seen = new Set();
+      const ids = [];
+
+      matches.forEach(match => {
+        const id = match.split('watch?v=')[1];
+        if (id && !seen.has(id)) {
+          seen.add(id);
+          ids.push(id);
+        }
+      });
+
+      return ids;
+    }
+
+    function extractVideoIdFromLink(link) {
+      if (!link) return '';
+      const match = link.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      return match ? match[1] : '';
+    }
+
+    function renderVideosFromJson(items) {
+      const section = document.getElementById('yt-videos-section');
+      if (!section) return;
+
+      const list = Array.isArray(items) ? items.slice(0, 6) : [];
+      if (!list.length) {
+        renderVideoMessage('No videos found.');
+        return;
+      }
+
+      section.innerHTML = '';
+      list.forEach(item => {
+        const videoId = extractVideoIdFromLink(item.link);
+        if (!videoId) return;
+
+        const title = (item.title || 'Latest Video').trim();
+        const date = formatDate(item.pubDate);
+        const thumb = item.thumbnail || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+        const card = document.createElement('div');
+        card.className = 'sidebar-video-card';
+        card.addEventListener('click', () => openVideo(videoId, title));
+        card.innerHTML = `
+          <div class="sidebar-thumb">
+            <img
+              src="${thumb}"
+              alt="${title}"
+              onerror="this.src='https://i.ytimg.com/vi/${videoId}/mqdefault.jpg'"
+            >
+            <div class="sidebar-play"><i class="fa-solid fa-play"></i></div>
+          </div>
+          <div class="sidebar-video-info">
+            <h4></h4>
+            <span>${date}</span>
           </div>`;
 
         card.querySelector('h4').textContent = title;
-        card.querySelector('img').alt = title;
         section.appendChild(card);
       });
 
       if (!section.children.length) {
-        renderVideoMessage('Latest videos could not be prepared for display.');
+        renderVideoMessage('No videos found.');
       }
     }
 
-    function formatPublishedDate(value) {
-      const published = new Date(value);
-      if (Number.isNaN(published.getTime())) {
-        return 'Recently published';
+    function fetchWithTimeout(url, timeoutMs) {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      let timeoutId = null;
+
+      if (controller) {
+        timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       }
 
-      return published.toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      });
+      return fetch(url, controller ? { signal: controller.signal } : undefined)
+        .finally(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+        });
     }
 
-    renderVideoMessage('Loading latest videos...');
+    // Try each feed source in sequence until one works.
+    async function fetchWithFallback(sources, url) {
+      for (let i = 0; i < sources.length; i++) {
+        const source = sources[i];
+        try {
+          const sourceUrl = source.buildUrl(url);
+          const res = await fetchWithTimeout(sourceUrl, 7000);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          if (source.type === 'xml') {
+            const text = await res.text();
+            if (!text.includes('<feed') && !text.includes('<entry')) throw new Error('Not a feed');
+            return { type: 'xml', data: text };
+          }
 
-    fetch(RSS_PROXY_URL)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Feed request failed with status ${response.status}`);
+          if (source.type === 'page') {
+            const text = await res.text();
+            const ids = extractVideoIdsFromPage(text);
+            if (!ids.length) throw new Error('No video IDs found in page source');
+            return { type: 'ids', data: ids };
+          }
+
+          const json = await res.json();
+          if (!json || json.status !== 'ok' || !Array.isArray(json.items)) {
+            throw new Error('Bad JSON feed payload');
+          }
+          return { type: 'json', data: json.items };
+        } catch (err) {
+          console.warn(`YT source ${i + 1} failed:`, err && err.message ? err.message : err);
+          if (i === sources.length - 1) throw err;
         }
-        return response.text();
+      }
+    }
+
+    // Kick off
+    renderVideoMessage('Loading latest videos…');
+
+    fetchWithFallback(FEED_SOURCES, YT_FEED_URL)
+      .then(result => {
+        if (result.type === 'xml') {
+          renderVideos(result.data);
+          return;
+        }
+        if (result.type === 'ids') {
+          renderVideosFromIds(result.data);
+          return;
+        }
+        renderVideosFromJson(result.data);
       })
-      .then(renderVideosFromFeed)
       .catch(() => {
-        renderVideoMessage('Unable to load videos right now. Please try again in a moment.');
+        renderVideosFromIds(FALLBACK_VIDEO_IDS);
       });
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeVideo(); closeCart(); } });
@@ -456,6 +625,9 @@
     // init badge
     renderCart();
   </script>
+
+  <!-- ── CLERK AUTH ────────────────────────────────────────── -->
+  <script src="../js/clerk-auth.js"></script>
 
 </body>
 </html>
