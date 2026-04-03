@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Cormorant+Garamond:wght@400;500;600&family=EB+Garamond:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #f6efe3;
+  --panel: #fffaf2;
+  --ink: #1f1a16;
+  --muted: #67594b;
+  --line: #d9c8b1;
+  --accent: #8a5a2b;
+  --accent-2: #b47a33;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255, 237, 204, 0.98) 0%, transparent 34%),
+    radial-gradient(circle at 90% 10%, rgba(217, 185, 141, 0.34) 0%, transparent 30%),
+    linear-gradient(180deg, #fffaf2 0%, var(--bg) 52%, #ead7b8 100%);
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
