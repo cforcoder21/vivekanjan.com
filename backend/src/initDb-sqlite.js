@@ -127,14 +127,14 @@ if (!existing) {
   const customerHash = await bcrypt.default.hash('Customer@12345', 10)
 
   db.prepare(`
-    INSERT INTO users(name, email, password_hash, role)
-    VALUES (?, ?, ?, ?)
-  `).run('Admin User', adminEmail, adminHash, 'admin')
+    INSERT INTO users(name, email, username, password_hash, role)
+    VALUES (?, ?, ?, ?, ?)
+  `).run('Admin User', adminEmail, 'admin', adminHash, 'admin')
 
   db.prepare(`
-    INSERT INTO users(name, email, password_hash, role)
-    VALUES (?, ?, ?, ?)
-  `).run('Test Customer', customerEmail, customerHash, 'customer')
+    INSERT INTO users(name, email, username, password_hash, role)
+    VALUES (?, ?, ?, ?, ?)
+  `).run('Test Customer', customerEmail, 'customer', customerHash, 'customer')
 
   console.log('✅ Default users created')
 }

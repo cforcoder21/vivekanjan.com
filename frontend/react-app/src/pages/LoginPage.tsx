@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useClerk } from '@clerk/clerk-react'
+import { useClerk, useUser } from '@clerk/clerk-react'
 
 export function LoginPage() {
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, setAuthFromStorage } = useAuth()
+  const { user: clerkUser, isLoaded, isSignedIn } = useUser()
   const { redirectToSignUp } = useClerk()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [name, setName] = useState('')
   const [username, setUsername] = useState('')
@@ -15,12 +18,88 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+
+  // Get the page to redirect to after login
+  const from = (location.state as any)?.from || '/books'
+
+  // Handle Clerk OAuth callback - sync with backend
+  useEffect(() => {
+    // Skip auto-auth if we just logged out (within 2 seconds)
+    const logoutTimeStr = localStorage.getItem('vas_logout_time')
+    if (logoutTimeStr) {
+      const logoutTime = parseInt(logoutTimeStr, 10)
+      const timeSinceLogout = Date.now() - logoutTime
+      if (timeSinceLogout < 2000) {
+        // Just logged out, skip auto-auth
+        localStorage.removeItem('vas_logout_time')
+        return
+      }
+      // Cleanup old logout marker
+      localStorage.removeItem('vas_logout_time')
+    }
+
+    // Only auto-auth if Clerk says we're signed in and we don't have a backend token
+    const hasBackendToken = localStorage.getItem('vas_token')
+    
+    if (isLoaded && isSignedIn && clerkUser && !hasBackendToken) {
+      handleClerkAuth()
+    }
+  }, [isLoaded, isSignedIn, clerkUser])
+
+  async function handleClerkAuth() {
+    try {
+      setLoading(true)
+      const clerkEmail = clerkUser?.emailAddresses?.[0]?.emailAddress
+      const clerkName = clerkUser?.firstName && clerkUser?.lastName 
+        ? `${clerkUser.firstName} ${clerkUser.lastName}`
+        : clerkUser?.firstName || 'User'
+      const clerkUsername = clerkUser?.username || `clerk_${clerkUser?.id?.slice(0, 8)}`
+
+      if (!clerkEmail) {
+        throw new Error('No email found from Clerk')
+      }
+
+      // Call backend OAuth sync endpoint
+      const response = await fetch('http://127.0.0.1:3212/auth/oauth-sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: clerkName,
+          email: clerkEmail,
+          username: clerkUsername,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'OAuth sync failed')
+      }
+
+      const data = await response.json()
+      
+      // Store token in localStorage using the same key as AuthContext
+      localStorage.setItem('vas_token', data.token)
+      localStorage.setItem('vas_user', JSON.stringify(data.user))
+      
+      // Immediately update AuthContext state
+      setAuthFromStorage()
+      
+      // Navigate back to requested page or to books
+      navigate(from, { replace: true })
+    } catch (err) {
+      console.error('Clerk auth error:', err)
+      setError(err instanceof Error ? err.message : 'Clerk authentication failed')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Handle Google OAuth redirect
   const handleGoogleSignIn = () => {
     redirectToSignUp({
-      redirectUrl: window.location.origin + '/books',
+      redirectUrl: window.location.origin + '/login',
     })
   }
 
@@ -35,7 +114,7 @@ export function LoginPage() {
       } else {
         await signUp(name, email, password, username)
       }
-      navigate('/books')
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed')
     } finally {

@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useContext, useMemo, useState, useEffect } from 'react'
 import { api } from '../lib/api'
 import type { User } from '../types'
 
@@ -8,12 +8,14 @@ type AuthContextType = {
   signIn: (emailOrUsername: string, password: string) => Promise<void>
   signUp: (name: string, email: string, password: string, username: string) => Promise<void>
   signOut: () => void
+  setAuthFromStorage: () => void  // For OAuth flow to trigger re-read
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
 const TOKEN_KEY = 'vas_token'
 const USER_KEY = 'vas_user'
+const LOGOUT_TIME_KEY = 'vas_logout_time'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY))
@@ -21,6 +23,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const raw = localStorage.getItem(USER_KEY)
     return raw ? (JSON.parse(raw) as User) : null
   })
+
+  // Listen for storage changes (OAuth flow, other tabs, etc)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const newToken = localStorage.getItem(TOKEN_KEY)
+      const newUserRaw = localStorage.getItem(USER_KEY)
+      const newUser = newUserRaw ? (JSON.parse(newUserRaw) as User) : null
+      setToken(newToken)
+      setUser(newUser)
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
+  // Allow OAuth flow to trigger state update
+  const setAuthFromStorage = () => {
+    const newToken = localStorage.getItem(TOKEN_KEY)
+    const newUserRaw = localStorage.getItem(USER_KEY)
+    const newUser = newUserRaw ? (JSON.parse(newUserRaw) as User) : null
+    setToken(newToken)
+    setUser(newUser)
+  }
 
   async function signIn(emailOrUsername: string, password: string) {
     const result = await api.signIn(emailOrUsername, password)
@@ -43,10 +68,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(USER_KEY)
+    // Mark logout time to prevent immediate Clerk re-auth
+    localStorage.setItem(LOGOUT_TIME_KEY, Date.now().toString())
   }
 
   const value = useMemo(
-    () => ({ token, user, signIn, signUp, signOut }),
+    () => ({ token, user, signIn, signUp, signOut, setAuthFromStorage }),
     [token, user],
   )
 

@@ -5,6 +5,7 @@ import cors from 'cors'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { query as sqlQuery, withTransaction, pool, db } from './db-sqlite.js'
+import './initDb-sqlite.js' // Initialize database schema on startup
 
 // Convert PostgreSQL SQL to SQLite SQL
 function toSQLite(sql, params = []) {
@@ -203,6 +204,107 @@ app.post('/signin', async (req, res) => {
       role: user.role,
     },
   })
+})
+
+// OAuth user sync endpoint - for Clerk and other OAuth providers
+app.post('/auth/oauth-sync', async (req, res) => {
+  try {
+    const name = String(req.body.name || '').trim()
+    const email = String(req.body.email || '').trim().toLowerCase()
+    let username = String(req.body.username || '').trim().toLowerCase()
+
+    if (!name || !email) {
+      return res.status(400).json({ error: 'name and email are required' })
+    }
+
+    // Check if user exists by email
+    const existingUser = await query('SELECT * FROM users WHERE email = ?', [email])
+    
+    if (existingUser.rowCount > 0) {
+      // User exists, return their JWT
+      const user = existingUser.rows[0]
+      const token = jwt.sign(
+        { id: user.id, role: user.role, email: user.email, username: user.username, name: user.name },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      )
+      return res.json({
+        message: 'OAuth user authenticated',
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        },
+      })
+    }
+
+    // User doesn't exist - create new account
+    // Generate username from email first
+    const baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9_-]/g, '_').slice(0, 20)
+    
+    // Check if provided username is valid and not taken
+    let finalUsername = null
+    if (username && username.length >= 3 && /^[a-z0-9_-]+$/.test(username)) {
+      const usernameCheck = await query('SELECT id FROM users WHERE username = ?', [username])
+      if (usernameCheck.rowCount === 0) {
+        finalUsername = username
+      }
+    }
+    
+    // If provided username is invalid/taken, generate a unique one
+    if (!finalUsername) {
+      let counter = 0
+      let checkUsername = baseUsername
+      while (true) {
+        const check = await query('SELECT id FROM users WHERE username = ?', [checkUsername])
+        if (check.rowCount === 0) {
+          finalUsername = checkUsername
+          break
+        }
+        counter += 1
+        checkUsername = `${baseUsername}${counter}`
+        if (counter > 100) throw new Error('Could not generate unique username')
+      }
+    }
+
+    // Generate a random password hash for OAuth users (they won't use it)
+    const randomPassword = crypto.randomBytes(32).toString('hex')
+    const passwordHash = await bcrypt.hash(randomPassword, 10)
+
+    // Create new user
+    await query(
+      `INSERT INTO users(name, email, username, password_hash, role)
+       VALUES (?, ?, ?, ?, 'customer')`,
+      [name, email, finalUsername, passwordHash]
+    )
+
+    // Fetch the created user
+    const result = await query('SELECT * FROM users WHERE email = ?', [email])
+    const user = result.rows[0]
+    const token = jwt.sign(
+      { id: user.id, role: user.role, email: user.email, username: user.username, name: user.name },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    return res.status(201).json({
+      message: 'OAuth user created and authenticated',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      },
+    })
+  } catch (error) {
+    console.error('OAuth sync error:', error)
+    res.status(500).json({ error: error.message || 'OAuth synchronization failed' })
+  }
 })
 
 app.get('/cart', authorize, async (req, res) => {

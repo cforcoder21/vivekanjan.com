@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getBookById } from '../data/books-data'
 import { CheckoutModal } from '../components/CheckoutModal'
@@ -7,6 +7,7 @@ import { CheckoutModal } from '../components/CheckoutModal'
 export function BookDetailPage() {
   const { bookId } = useParams<{ bookId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { token, user } = useAuth()
   const [showCheckout, setShowCheckout] = useState(false)
 
@@ -25,7 +26,7 @@ export function BookDetailPage() {
 
   function handleBuyHere() {
     if (!token) {
-      navigate('/login', { state: { from: `/book/${bookId}` } })
+      navigate('/login', { state: { from: location.pathname } })
       return
     }
     setShowCheckout(true)

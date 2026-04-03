@@ -1,8 +1,23 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useClerk } from '@clerk/clerk-react'
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth()
+  const { signOut: clerkSignOut } = useClerk()
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    // Sign out from both backend and Clerk
+    signOut()
+    try {
+      await clerkSignOut()
+    } catch (err) {
+      console.error('Clerk logout error:', err)
+    }
+    // Redirect to home after logout
+    navigate('/', { replace: true })
+  }
 
   return (
     <div className="app-shell">
@@ -22,7 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link to="/profile" className="icon-link icon-link-profile" aria-label="Profile" title="Profile">
                   <i className="fa-solid fa-circle-user" aria-hidden="true" />
                 </Link>
-                <button type="button" onClick={signOut} className="btn-logout">Logout</button>
+                <button type="button" onClick={handleLogout} className="btn-logout">Logout</button>
               </>
             ) : (
               <Link to="/login" className="icon-link">Login</Link>

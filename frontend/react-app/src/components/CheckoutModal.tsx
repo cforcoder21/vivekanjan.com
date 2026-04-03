@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { BookData } from '../data/books-data'
 
 type CheckoutModalProps = {
@@ -23,6 +23,14 @@ type RazorpayOptions = {
 }
 
 export function CheckoutModal({ book, onClose, user }: CheckoutModalProps) {
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   const [formData, setFormData] = useState({
     fullName: user?.name || '',
     email: user?.email || '',
